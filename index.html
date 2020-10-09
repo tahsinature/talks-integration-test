@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <title>reveal.js</title>
+
+    <link rel="stylesheet" href="dist/my-styles/main.css" />
+    <link rel="stylesheet" href="dist/reset.css" />
+    <link rel="stylesheet" href="dist/reveal.css" />
+    <link rel="stylesheet" href="dist/theme/black.css" id="theme" />
+
+    <!-- Theme used for syntax highlighted code -->
+    <link
+      rel="stylesheet"
+      href="plugin/highlight/monokai.css"
+      id="highlight-theme"
+    />
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!--------------------------->
+        <!---------- Cover ---------->
+        <!--------------------------->
+        <section
+          data-background="https://www.webivm.com/wp-content/uploads/2016/12/Coding-Background.jpg"
+          data-state="startingcover"
+        >
+          <img
+            src="https://miro.medium.com/max/3840/1*hRCR2q2OF7cPjIi1ZZbHPg.jpeg"
+            alt="Integration-test-image"
+            style="
+              border-radius: 10px;
+              height: 180px;
+              margin: 0 auto 4rem auto;
+              background: transparent;
+            "
+          />
+          <h3>
+            Dos and Don'ts of
+            <br />
+            <span class="hlight">Unit & Integration Testing</span>
+          </h3>
+          <p>
+            <small>Created by <a href="https://tahsin.codes">Tahsin</a></small>
+          </p>
+        </section>
+
+        <!--------------------------->
+        <!-- Before we get started -->
+        <!--------------------------->
+        <section>
+          <section id="fragments">
+            <h3>Few things before we get started:</h3>
+            <small class="fragment">
+              This is not a tutorial on integration / unit tests.
+            </small>
+            <small class="fragment">
+              All scenario focused here based on the problems in our
+              development.
+            </small>
+            <small class="fragment">
+              If bad example matches your implementation, do not get hurt.
+            </small>
+            <small class="fragment">
+              You may want to take notes as we go through.
+            </small>
+          </section>
+
+          <section>
+            <q>Try to go paperless to save our earth 🌍 from global warming.</q>
+            <p style="text-align: right">&mdash; Nanda Reynaldi</p>
+          </section>
+
+          <section
+            data-background="https://media.giphy.com/media/rytLWOErAX1F6/giphy.gif"
+          >
+            <img
+              src="https://media.giphy.com/media/3ohnEqJ1XOfvWaSk7e/giphy.gif"
+              alt="rocket"
+              style="border-radius: 10px"
+            />
+            <p>Alright, buckle up &</p>
+            <h3>Let's get started</h3>
+          </section>
+        </section>
+
+        <!-------------------------------->
+        <!-- What is Unit & Integration -->
+        <!-------------------------------->
+        <section>
+          <section>
+            <h1>
+              Metaphor of <br />
+              Testing
+            </h1>
+          </section>
+          <section data-auto-animate>
+            <h3 data-id="code-title">Device Data Parser</h3>
+            <pre
+              data-id="code-animation"
+            ><code class="ts" data-trim data-line-numbers>
+                <script type="text/template">
+                  function parseDeviceData(value: string) {
+                    ...
+                  }
+                </script>
+            </code></pre>
+          </section>
+          <section data-auto-animate>
+            <h3>Device Data Parser</h3>
+            <pre
+              data-id="code-animation"
+            ><code class="ts" data-trim data-line-numbers>
+                <script type="text/template">
+                  function parseDeviceData(value: string) {
+                    const arr = value.split('/')
+                    const map = {
+                      deviceName: arr[0],
+                      deviceVersion: arr[1]
+                    }
+                    if (Object.values(map).every(value => typeof value === 'string')) return map
+                    else throw new Error('device data properly not formatted.')
+                  }                    
+                </script>
+            </code></pre>
+          </section>
+          <section>
+            <h1>Assertions</h1>
+            <p class="fragment">
+              Check if throws error if passed an invalid value.
+            </p>
+            <p class="fragment">
+              Check if throws error if passed a valid value.
+            </p>
+            <p class="fragment">Check if we get expected value as return</p>
+          </section>
+        </section>
+
+        <!--------------------------->
+        <!-- Structure Application -->
+        <!--------------------------->
+        <section class="structureapplication">
+          <section
+            class="cover"
+            data-background="./examples/assets/prepare-for-trip-image.png"
+          >
+            <h1>Prepare Application for Testing</h1>
+          </section>
+          <section>
+            <img
+              src="./examples/assets/separating.png"
+              style="height: 200px; border-radius: 10px"
+            />
+            <p>Separate application.js and server.js</p>
+          </section>
+          <section data-auto-animate>
+            <p>Express Application</p>
+            <pre
+              data-id="code-animation"
+            ><code class="js" data-trim data-line-numbers="|2|4-6|8|9-13">
+                <script type="text/template">
+                  const express = require('express')
+                  const app = express()
+                   
+                  app.get('/', function (req, res) {
+                    res.json({ success: true })
+                  })
+                   
+                  const server = app.listen(8000)
+                  const io = require('socket.io')(server);
+
+                  io.on('connect', socket => {
+                    console.log('socket connected');
+                  });
+                </script>
+              </code></pre>
+          </section>
+
+          <section data-auto-animate>
+            <aside class="notes" data-markdown>
+              <script type="text/template">
+                branch name: `prepare-app-for-testing`
+              </script>
+            </aside>
+            <p>application.js</p>
+            <pre data-id="code-animation">
+              <code class="js" data-trim data-line-numbers>
+                <script type="text/template">
+                  const express = require('express')
+                  const app = express()
+                   
+                  app.get('/', function (req, res) {
+                    res.json({ success: true })
+                  })
+                   
+                  module.exports = app
+                </script>
+              </code></pre>
+          </section>
+          <section>
+            <img
+              src="./examples/assets/on-off-switch.png"
+              style="height: 300px; border-radius: 10px"
+            />
+            <p>On & Off switch of the application</p>
+          </section>
+          <section>
+            <p>Our standard boilerplate App file</p>
+            <pre data-id="code-animation">
+              <code class="ts" data-trim data-line-numbers="|2|5-10|14-17">
+                <script type="text/template">
+                  class Application {
+                    public readonly app = express()
+                  
+                    public async load() {
+                      await pubSub.init()
+                      await connectMongoDB()
+                      await connectRedis()
+
+                      this.app.use(routes)
+                      this.app.use(exceptionHandler)
+                    }
+                  
+                    public async stop() {
+                      await pubSub.closePubSub()
+                      await closeMongoDB()
+                      await redisGlobalClient.turnOff()
+                    }
+                  }
+                </script>
+              </code></pre>
+          </section>
+
+          <section>
+            <aside class="notes" data-markdown>
+              <script type="text/template">
+                #### problems
+                - need to repeat
+                - need to memorize what is running because of this test file
+
+                #### examples
+                - branchname: `on-off-switch-without`
+              </script>
+            </aside>
+            <p>Without on-off switch</p>
+
+            <pre
+              data-id="code-animation"
+            ><code class="ts" data-trim data-line-numbers>
+                    <script type="text/template">
+                      beforeAll(async () => {
+                        await pubSub.init()
+                        await connectMongoDB()
+                        await connectRedis()
+                      })
+                      
+                      afterAll(async () => {
+                        await pubSub.closePubSub()
+                        await closeMongoDB()
+                        await redisGlobalClient.turnOff()
+                      })
+                    </script>
+                  </code></pre>
+          </section>
+
+          <section>
+            <aside class="notes" data-markdown="">
+              <script type="text">
+                #### examples
+                branchname: `on-off-switch-with`
+              </script>
+            </aside>
+            <p>With on-off switch</p>
+
+            <pre
+              data-id="code-animation"
+            ><code class="ts" data-trim data-line-numbers="|1|2">
+                    <script type="text/template">
+                      beforeAll(async () => container.load())
+                      afterAll(async () => await container.stop())
+                    </script>
+                  </code></pre>
+          </section>
+
+          <section data-background="./examples/assets/turn-off.gif">
+            <h2
+              style="
+                background-color: rgba(0, 0, 0, 0.418);
+                border-radius: 10px;
+                padding: 1rem;
+              "
+            >
+              Make sure off switch works properly.
+            </h2>
+          </section>
+
+          <section>
+            <h3>
+              <span style="color: rgba(255, 0, 0, 0.753)">Non-ideal</span> test
+              script
+            </h3>
+            <pre><code class="json" data-trim>
+                <script type="text/template">
+                  {
+                    "name": "random-app",
+                    "version": "0.0.1",
+                    "private": true,
+                    "scripts": {
+                      "start": "bin/run",
+                      "test": "jest --detectOpenHandles --runInBand --verbose --coverage --forceExit --passWithNoTests src/__tests__/integration src/__tests__/unit"
+                    }
+                  }                  
+                </script>
+              </code></pre>
+          </section>
+
+          <section>
+            <h3><span style="color: green">Ideal</span> test script</h3>
+            <pre><code class="json" data-trim>
+                <script type="text/template">
+                  {
+                    "name": "random-app",
+                    "version": "0.0.1",
+                    "private": true,
+                    "scripts": {
+                      "start": "bin/run",
+                      "test": "jest --runInBand --coverage"
+                    }
+                  }                  
+                </script>
+              </code></pre>
+          </section>
+
+          <section>
+            <h1>Advantages</h1>
+            <hr />
+            <ol>
+              <li class="fragment">
+                Not running server or other things that is not necessary during
+                test.
+              </li>
+              <li class="fragment">Running external resources easily.</li>
+              <li class="fragment">Closing external resources easily.</li>
+              <li class="fragment">
+                Not repeating those same things over test files.
+              </li>
+              <li class="fragment">Properly exiting application.</li>
+            </ol>
+          </section>
+        </section>
+
+        <!--------------------->
+        <!-- Utilize Seeders -->
+        <!--------------------->
+        <section>
+          <section>
+            <h1>Utilize Seeders</h1>
+          </section>
+
+          <section>
+            <h2>Not Using Seeder</h2>
+            <pre><code class="ts" data-trim data-line-numbers="|5-11">
+                <script type="text/template">
+                  import { User } from '@root/database/models/user'
+                  import faker from 'faker'
+
+                  it('should get profile', async () => {
+                    const user = User.create({
+                      name: faker.name(),
+                      email: faker.email(),
+                      ...
+                      ...
+                      ...
+                    })
+                    const res = await request(app).get(/profile).set(headers)
+                
+                    expect(res.status).toBe(200)
+                    expect(res.body.result).toMatchObject({
+                      username: user.name,
+                      email: user.email,
+                      photo: user.photo
+                    })
+                  })
+                </script>
+              </code></pre>
+          </section>
+
+          <section>
+            <h2>Seeder</h2>
+            <pre>
+              <code class="ts" data-trim data-line-numbers="|2-6|8-17">
+                <script type="text/template">
+                  class SeedUser {
+                    async seed(count: number) {
+                      const all = []
+                      for (const masterRegion of Array(count)) await this.createOne()
+                      return all
+                    }
+
+                    async createOne() {
+                      return MasterService.create({
+                        name: faker.person.name(),
+                        email: faker.internet.email(),
+                        location: faker.address.street(),
+                        age: faker.random.number(),
+                        country: faker.address.country(),
+                        isActive: true
+                      })
+                    }
+                  }
+
+                  export const seedUser = new SeedUser()
+                </script>
+              </code>
+            </pre>
+          </section>
+
+          <section>
+            <h2>Using Seeder</h2>
+            <pre><code class="ts" data-trim data-line-numbers="|2">
+                <script type="text/template">
+                  it('should get profile', async () => {
+                    const user = await seedUser.createOne()
+                    const res = await request(app).get(/profile).set(headers)
+                
+                    expect(res.status).toBe(200)
+                    expect(res.body.result).toMatchObject({
+                      username: user.name,
+                      email: user.email,
+                      photo: user.photo
+                    })
+                  })
+                </script>
+              </code></pre>
+          </section>
+
+          <section>
+            <h2>Advantages</h2>
+            <hr />
+            <ol>
+              <li class="fragment">No need to import Models.</li>
+              <li class="fragment">
+                As not creating data via Models, no need to pass objects to
+                models.
+              </li>
+              <li class="fragment">Test files not getting fat.</li>
+              <li class="fragment">Re-using code from seeder.</li>
+            </ol>
+          </section>
+        </section>
+
+        <!---------------------------------->
+        <!-- Do not repeat yourself (DRY) -->
+        <!---------------------------------->
+        <section class="donotrepeatyourself">
+          <section
+            class="cover"
+            data-background="./examples/assets/repetition.png"
+          >
+            <div class="text">
+              <h2>Do-not Repeat Yourself</h2>
+              <h4>(DRY)</h4>
+            </div>
+          </section>
+
+          <section id="donotrepeat-problem1">
+            <h3>Problem 1</h3>
+            <p>Repetitive header declaration</p>
+            <pre><code data-trim data-line-numbers="|9-13|19-23|29-33|39-43|">
+              <script type="text/template" >
+                const request = require("supertest");
+                const { app, closeApp, loadApp } = require("../src/application");
+                
+                beforeAll(async () => await loadApp());
+                afterAll(async () => await closeApp());
+                
+                describe("demo test", () => {
+                  it("should get a response", async () => {
+                    const headers = {
+                      header1: "value 1",
+                      header2: "value 2",
+                      header3: "value 3",
+                    };
+                    const res = await request(app).get("/").set(headers);
+                    expect(res.body).toMatchObject({ success: true });
+                  });
+                
+                  it("should get a response", async () => {
+                    const headers = {
+                      header1: "value 1",
+                      header2: "value 2",
+                      header3: "value 3",
+                    };
+                    const res = await request(app).get("/").set(headers);
+                    expect(res.body).toMatchObject({ success: true });
+                  });
+                
+                  it("should get a response", async () => {
+                    const headers = {
+                      header1: "value 1",
+                      header2: "value 2",
+                      header3: "value 3",
+                    };
+                    const res = await request(app).get("/").set(headers);
+                    expect(res.body).toMatchObject({ success: true });
+                  });
+                
+                  it("should get a response", async () => {
+                    const headers = {
+                      header1: "value 1",
+                      header2: "value 2",
+                      header3: "value 3",
+                    };
+                    const res = await request(app).get("/").set(headers);
+                    expect(res.body).toMatchObject({ success: true });
+                  });
+                });
+              </script>
+            </code></pre>
+            <a
+              target="_blank"
+              href="https://gitlab.com/halojasa-engineering/backend/microservices/authentication-service/authentication-module/-/blob/c4ca510876e6594ba663a42874d9d642c6a763ea/src/__tests__/post-vendor-auth.test.ts"
+              >Real Example</a
+            >
+          </section>
+
+          <section data-auto-animate id="donotrepeat-problem2">
+            <h3 data-id="problem2">Problem 2</h3>
+            <p>Writing same case in every file</p>
+            <pre><code data-trim data-line-numbers=""><script type="text/template">
+              // file-a.test.ts
+              it("should get a invalid header error if no header", async () => {
+                const res = await request(app).get("/");
+                expect(res.status).toBe(400);
+              });
+              
+              it("should .........", async () => {
+                .
+                .
+              });
+
+              it("should .........", async () => {
+                .
+                .
+              });
+            </script></code></pre>
+          </section>
+
+          <section data-auto-animate>
+            <h3 data-id="problem2">Problem 2</h3>
+            <p>Writing same case in every file</p>
+            <pre><code data-trim data-line-numbers=""><script type="text/template">
+              // file-b.test.ts
+              it("should get a invalid header error if no header", async () => {
+                const res = await request(app).get("/");
+                expect(res.status).toBe(400);
+              });
+
+              it("should .........", async () => {
+                .
+                .
+              });
+
+              it("should .........", async () => {
+                .
+                .
+              });
+            </script></code></pre>
+          </section>
+
+          <section data-auto-animate>
+            <h3 data-id="problem2">Problem 2</h3>
+            <p>Writing same case in every file</p>
+            <pre><code data-trim data-line-numbers=""><script type="text/template">
+              // file-c.test.ts
+              it("should get a invalid header error if no header", async () => {
+                const res = await request(app).get("/");
+                expect(res.status).toBe(400);
+              });
+
+              it("should .........", async () => {
+                .
+                .
+              });
+
+              it("should .........", async () => {
+                .
+                .
+              });
+            </script></code></pre>
+          </section>
+
+          <section id="donotrepeat-problem3">
+            <h3>Problem 3</h3>
+            <p>Writing as many cases as payload variation</p>
+            <pre><code data-trim data-line-numbers="|50-53|8-13|18-23|28-33|38-43"><script type="text/template">
+              const request = require("supertest");
+              const { app, closeApp, loadApp } = require("../src/application");
+              
+              beforeAll(async () => await loadApp());
+              afterAll(async () => await closeApp());
+              
+              describe("demo test", () => {
+                it("should get error if name is missing", async () => {
+                  const res = await request(app).post("/register").send({
+                    email: "john@email.com",
+                    phone: "+123456",
+                    location: "USA",
+                  });
+              
+                  expect(res.status).toBe(400);
+                });
+              
+                it("should get error if email is missing", async () => {
+                  const res = await request(app).post("/register").send({
+                    name: "john doe",
+                    phone: "+123456",
+                    location: "USA",
+                  });
+              
+                  expect(res.status).toBe(400);
+                });
+              
+                it("should get error if phone is missing", async () => {
+                  const res = await request(app).post("/register").send({
+                    name: "john doe",
+                    email: "john@email.com",
+                    location: "USA",
+                  });
+              
+                  expect(res.status).toBe(400);
+                });
+              
+                it("should get error if phone is missing", async () => {
+                  const res = await request(app).post("/register").send({
+                    name: "john doe",
+                    email: "john@email.com",
+                    phone: "+123456",
+                  });
+              
+                  expect(res.status).toBe(400);
+                });
+              
+                it("should get success response", async () => {
+                  const res = await request(app).post("/register").send({
+                    name: "john doe",
+                    email: "john@email.com",
+                    phone: "+123456",
+                    location: "USA",
+                  });
+              
+                  expect(res.status).toBe(200);
+                });
+              });              
+            </script></code></pre>
+            <a
+              target="_blank"
+              href="https://gitlab.com/halojasa-engineering/backend/microservices/authentication-service/authentication-module/-/blob/c4ca510876e6594ba663a42874d9d642c6a763ea/src/__tests__/post-vendor-auth.test.ts"
+              >Example</a
+            >
+          </section>
+
+          <section id="donotrepeat-problem4">
+            <h3>Problem 4</h3>
+            <p>Extracting and comparing each properties in an object.</p>
+            <pre><code data-trim data-line-numbers="|50-53|8-13|18-23|28-33|38-43"><script type="text/template">
+              it("should get success response", async () => {
+                const res = await request(app).post("/register");
+            
+                expect(res.status).toBe(200);
+                expect(res.body.name).toBeDefined();
+                expect(res.body.name).toBe("John");
+                expect(res.body.email).toBeDefined();
+                expect(res.body.email).toBe("john@mail.com");
+                expect(res.body.age).toBeDefined();
+                expect(res.body.age).toBe(30);
+                expect(res.body.coordinate).toBeDefined();
+                expect(res.body.coordinate.lat).toBe(1);
+                expect(res.body.coordinate.lon).toBe(2);
+              });
+            </script></code></pre>
+            <a
+              target="_blank"
+              href="https://gitlab.com/halojasa-engineering/backend/microservices/authentication-service/authentication-module/-/blob/3057a5208ad6847f24d7aa01bba84ee9601c7260/src/__tests__/integration/vendor/login.test.ts"
+              >Another Example</a
+            >
+          </section>
+
+          <section>
+            <aside class="notes" data-markdown>
+              <script type="text/template">
+                ### Repetitive Headers Solution
+                ### Demonstrate
+                - `delete headers["something"]`
+                - `headers["authorization"] = "Bearer xxxxxx"`
+
+                solution branch: `repetitive-headers`
+              </script>
+            </aside>
+            <h3>Solution to</h3>
+            <a href="#donotrepeat-problem1">Problem 1</a>
+            <hr />
+            <p class="fragment">
+              Create a very generic utility to provide the headers which can be
+              used for all sorts of test cases.
+            </p>
+          </section>
+
+          <section>
+            <aside class="notes" data-markdown="">
+              <script type="text/template">
+                ### Repetitive Test Cases Solution
+                branch: `repetitive-case`
+              </script>
+            </aside>
+            <h3>Solution to</h3>
+            <a href="#donotrepeat-problem2">Problem 2</a>
+            <hr />
+            <p class="fragment">
+              Create a separate test file for the repetitive test.
+            </p>
+          </section>
+
+          <section>
+            <aside class="notes" data-markdown="">
+              <script type="text/template">
+                ### Writing as many cases as payload variation Solution
+                branch: `repetitive-payload-variation`
+              </script>
+            </aside>
+            <h3>Solution to</h3>
+            <a href="#donotrepeat-problem3">Problem 3</a>
+            <hr />
+            <p class="fragment">
+              Just create one case with invalid request. If it works, all will
+              work. The only purpose is,
+              <b class="fragment"
+                ><u>checking if we connected body validator.</u></b
+              >
+            </p>
+          </section>
+
+          <section>
+            <aside class="notes" data-markdown="">
+              <script type="text/template">
+                ### Writing as many cases as payload variation Solution
+                branch: `extracting-and-comparing-each-property-object`
+              </script>
+            </aside>
+            <h3>Solution to</h3>
+            <a href="#donotrepeat-problem4">Problem 4</a>
+            <hr />
+            <p class="fragment">
+              Pass the whole object as expectation (depends on case).
+            </p>
+          </section>
+
+          <section>
+            <img
+              style="border-radius: 10px"
+              src="./examples/assets/Image 2020-10-03 17-08-03.png"
+              alt=""
+            />
+          </section>
+          <section data-auto-animate>
+            <h3>Bad Way</h3>
+            <pre
+              data-id="code-animation"
+            ><code class="ts" data-trim data-line-numbers><script type="text/template">
+                  it('should get success response if region and service found', async () => {
+                    const masterRegion = await seedMasterRegion.createOne('Region1', ['Jakarta'])
+                    const masterServices = await seedMasterService.seed([masterRegion])
+                    const res = await request(app).get(url).set(headers)
+                
+                
+                    expect(res.status).toBe(200)
+                    expect(res.body.status).toBe(200)
+                    expect(res.body.result.region).toBeDefined()
+                    expect(res.body.result.region.regionId).toBe(masterRegion.id)
+                    expect(res.body.result.region.regionName).toBe(masterRegion.name)
+                    expect(res.body.result.region).toMatchObject({ regionId: masterRegion.id, regionName: masterRegion.name })
+                    expect(res.body.result.services).toBeDefined()
+                    expect(res.body.result.services[0].serviceName).toBe(masterServices[0].name)
+                    expect(res.body.result.services[0].serviceCode).toBe(masterServices[0].code)
+                  })
+                </script></code></pre>
+          </section>
+          <section data-auto-animate>
+            <h3 data-id="code-title">Good Way</h3>
+            <pre
+              data-id="code-animation"
+            ><code class="ts" data-trim data-line-numbers="|7|8|7,8">
+              <script type="text/template">
+                  it('should get success response if region and service found', async () => {
+                    const masterRegion = await seedMasterRegion.createOne('Region1', ['Jakarta'])
+                    const masterServices = await seedMasterService.seed([masterRegion])
+                    const res = await request(app).get(url).set(headers)
+                
+                    expect(res.status).toBe(200)
+                    expect(res.body.result.region).toMatchObject({ regionId: masterRegion.id, regionName: masterRegion.name })
+                    expect(res.body.result.services).toMatchObject(masterServices.map(ele => ({ serviceName: ele.name, serviceCode: ele.code })))
+                  })
+              </script>  
+              </code></pre>
+          </section>
+        </section>
+
+        <!--------------------------->
+        <!-- Always do fresh start -->
+        <!--------------------------->
+        <section data-state="alwaysdofreshstart">
+          <section
+            class="cover"
+            data-background="https://i.pinimg.com/originals/f3/98/60/f39860ba6df09f5c1f76ae59175e73b4.png"
+          >
+            <h1>Always do a clean start</h1>
+          </section>
+          <section>
+            <h2>What does it mean?</h2>
+            <p class="fragment">Do not use any leftovers</p>
+            <p class="fragment">
+              Make sure your database is clean before each test case
+            </p>
+            <p class="fragment">
+              If need to create anything, create inside test block
+            </p>
+          </section>
+
+          <section>
+            <p>Bad Way</p>
+            <pre>
+              <code class="ts" data-trim data-line-numbers="|28-30|220-236|220|223-227|231">
+                <script type="text/template">
+                  import request from 'supertest'
+                  import { Express } from 'express'
+                  
+                  import { Application } from '@app/core/server/application'
+                  import { flag } from '@app/core/core'
+                  import { postVendorAuthSeeder, globalHeader } from '@app/helper'
+                  import mongoose from 'mongoose'
+                  
+                  import { redisGlobalClient } from '@app/core/config/redis/redis.config'
+                  import { getLocalizedMsg } from '@app/utils/locales'
+                  
+                  const loginUrl = '/authentication/vendor/login'
+                  const traceId = 'a6573287-7fbc-4ea6-9a90-995bec164414'
+                  const phoneVendorCorporateActive = '81324361871'
+                  const phoneVendorCorporateBlocked = '81324361872'
+                  const phoneVendorActive = '81324361873'
+                  const phoneVendorNotActive = '81324361874'
+                  const phoneVendorNotFound = '81324361875'
+                  const phoneVendorAlreadyLogin = '81324361876'
+                  
+                  describe('Vendor Login', () => {
+                    let app: Express
+                  
+                    beforeAll(async () => {
+                      app = await Application.createTesting()
+                    })
+                  
+                    beforeEach(async () => {
+                      await postVendorAuthSeeder()
+                    })
+                  
+                    afterEach(async done => {
+                      await mongoose.connection.db.dropDatabase()
+                      done()
+                    })
+                  
+                    afterAll(async () => {
+                      await redisGlobalClient.turnOff()
+                    })
+                  
+                    it('should return invalid body with no phoneNumber', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        pin: '123456',
+                        type: 'INDIVIDUAL'
+                      })
+                      expect(res.status).toBe(400)
+                      expect(res.body.status).toBe(400)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.errors.flag).toEqual(flag.INVALID_BODY)
+                      expect(res.body.errors.details[0].path[0]).toEqual('phoneNumber')
+                    })
+                  
+                    it('should return invalid body with no pin', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        phoneNumber: phoneVendorActive,
+                        type: 'INDIVIDUAL'
+                      })
+                      expect(res.status).toBe(400)
+                      expect(res.body.status).toBe(400)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.errors.flag).toEqual(flag.INVALID_BODY)
+                      expect(res.body.errors.details[0].path[0]).toEqual('pin')
+                    })
+                  
+                    it('should return invalid body with no type', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        phoneNumber: phoneVendorActive,
+                        pin: '123456'
+                      })
+                      expect(res.status).toBe(400)
+                      expect(res.body.status).toBe(400)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.errors.flag).toEqual(flag.INVALID_BODY)
+                      expect(res.body.errors.details[0].path[0]).toEqual('type')
+                    })
+                  
+                    it('should return invalid credentials with phone number not found', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        phoneNumber: phoneVendorNotFound,
+                        pin: '123456',
+                        type: 'INDIVIDUAL'
+                      })
+                      expect(res.status).toBe(400)
+                      expect(res.body.status).toBe(400)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.errors.flag).toEqual(flag.INVALID_CREDENTIALS)
+                      expect(res.body.errors.message).toEqual(getLocalizedMsg(flag.INVALID_CREDENTIALS, 'en'))
+                    })
+                  
+                    it('should return invalid credentials with wrong pin', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        phoneNumber: phoneVendorActive,
+                        pin: '123457',
+                        type: 'INDIVIDUAL'
+                      })
+                      expect(res.status).toBe(400)
+                      expect(res.body.status).toBe(400)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.errors.flag).toEqual(flag.INVALID_CREDENTIALS)
+                      expect(res.body.errors.message).toEqual(getLocalizedMsg(flag.INVALID_CREDENTIALS, 'en'))
+                    })
+                  
+                    it('should return invalid credentials with wrong pin', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        phoneNumber: phoneVendorActive,
+                        pin: '123457',
+                        type: 'INDIVIDUAL'
+                      })
+                      expect(res.status).toBe(400)
+                      expect(res.body.status).toBe(400)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.errors.flag).toEqual(flag.INVALID_CREDENTIALS)
+                      expect(res.body.errors.message).toEqual(getLocalizedMsg(flag.INVALID_CREDENTIALS, 'en'))
+                    })
+                  
+                    it('should return invalid credentials with wrong type', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        phoneNumber: phoneVendorActive,
+                        pin: '123456',
+                        type: 'CORPORATE_VENDOR'
+                      })
+                      expect(res.status).toBe(400)
+                      expect(res.body.status).toBe(400)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.errors.flag).toEqual(flag.INVALID_CREDENTIALS)
+                      expect(res.body.errors.message).toEqual(getLocalizedMsg(flag.INVALID_CREDENTIALS, 'en'))
+                    })
+                  
+                    it('should return invalid credentials with wrong type', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        phoneNumber: phoneVendorCorporateActive,
+                        pin: '123456',
+                        type: 'INDIVIDUAL'
+                      })
+                      expect(res.status).toBe(400)
+                      expect(res.body.status).toBe(400)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.errors.flag).toEqual(flag.INVALID_CREDENTIALS)
+                      expect(res.body.errors.message).toEqual(getLocalizedMsg(flag.INVALID_CREDENTIALS, 'en'))
+                    })
+                  
+                    it('should return account suspend with suspended vendor individual', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        phoneNumber: phoneVendorNotActive,
+                        pin: '123456',
+                        type: 'INDIVIDUAL'
+                      })
+                      expect(res.status).toBe(403)
+                      expect(res.body.status).toBe(403)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.errors.flag).toBeTruthy()
+                      expect(res.body.errors.message).toBeTruthy()
+                    })
+                  
+                    it('should return account suspend with suspended vendor corporate', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        phoneNumber: phoneVendorCorporateBlocked,
+                        pin: '123456',
+                        type: 'CORPORATE_VENDOR'
+                      })
+                      expect(res.status).toBe(403)
+                      expect(res.body.status).toBe(403)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.errors.flag).toBeTruthy()
+                      expect(res.body.errors.message).toBeTruthy()
+                    })
+                  
+                    it('should return vendor already login', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        phoneNumber: phoneVendorAlreadyLogin,
+                        pin: '123456',
+                        type: 'INDIVIDUAL'
+                      })
+                      expect(res.status).toBe(403)
+                      expect(res.body.status).toBe(403)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.errors.flag).toEqual(flag.REACHED_MAX_DEVICE)
+                      expect(res.body.errors.message).toEqual(getLocalizedMsg(flag.REACHED_MAX_DEVICE, 'en'))
+                    })
+                  
+                    it('should return token vendor individual', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        phoneNumber: phoneVendorActive,
+                        pin: '123456',
+                        type: 'INDIVIDUAL'
+                      })
+                      expect(res.status).toBe(200)
+                      expect(res.body.status).toBe(200)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.result.accessToken).toBeTruthy()
+                      expect(res.body.result.refreshToken).toBeTruthy()
+                      expect(res.body.result.phoneNumber).toBeTruthy()
+                      expect(res.body.result.type).toEqual('INDIVIDUAL')
+                    })
+                  
+                    it('should return token vendor corporate', async () => {
+                      const header = globalHeader(traceId, undefined)
+                  
+                      const res = await request(app).post(loginUrl).set(header).send({
+                        phoneNumber: phoneVendorCorporateActive,
+                        pin: '123456',
+                        type: 'CORPORATE_VENDOR'
+                      })
+                      expect(res.status).toBe(200)
+                      expect(res.body.status).toBe(200)
+                      expect(res.body.traceId).toEqual(traceId)
+                      expect(res.body.result.accessToken).toBeTruthy()
+                      expect(res.body.result.phoneNumber).toBeTruthy()
+                      expect(res.body.result.refreshToken).toBeTruthy()
+                      expect(res.body.result.type).toEqual('CORPORATE_VENDOR')
+                    })
+                  })                  
+                </script>
+              </code>
+            </pre>
+            <a
+              target="_blank"
+              href="https://gitlab.com/halojasa-engineering/backend/microservices/authentication-service/authentication-module/-/blob/3057a5208ad6847f24d7aa01bba84ee9601c7260/src/__tests__/integration/vendor/login.test.ts"
+              >Source</a
+            >
+          </section>
+          <section>
+            <p>Proper Way</p>
+            <pre>
+              <code class="ts" data-trim data-line-numbers="|17-20|40-48|40|41|42|43|46,47">
+                <script type="text/template">
+                  import request from 'supertest'
+                  import Application from '@root/app/server/application'
+                  import { flag } from '@root/app/core'
+                  import { getDefaultHeaders } from '@root/__tests__/util'
+                  import { flushMongoDB } from '@root/database/mongo'
+                  import { seedMasterService } from '@root/database/mongo/seeds/masterService'
+                  import { seedMasterRegion } from '@root/database/mongo/seeds/masterRegion'
+                  import { getLocalizedMsg } from '@root/utils/locales'
+                  
+                  let headers: any
+                  const container = new Application()
+                  const { app } = container
+                  const url = '/master/service-availability'
+                  
+                  beforeAll(async () => container.load())
+                  afterAll(async () => await container.stop())
+                  beforeEach(async () => {
+                    headers = getDefaultHeaders()
+                    await flushMongoDB()
+                  })
+                  
+                  describe('Get Halo Massage Products', () => {
+                    it('should get 400 error if no city found in the database by requested coordinate', async () => {
+                      const res = await request(app).get(url).set(headers)
+                  
+                      expect(res.status).toBe(400)
+                      expect(res.body.errors.flag).toBe(flag.NOT_AVAILABLE)
+                      expect(res.body.errors.message).toBe(getLocalizedMsg({ key: 'SERVICE_NOT_AVAILABLE' }, headers['accept-language']))
+                    })
+                  
+                    it('should get 400 error if city found by give coordinate but no service', async () => {
+                      await seedMasterRegion.createOne('Region1', ['Jakarta'])
+                      const res = await request(app).get(url).set(headers)
+                  
+                      expect(res.status).toBe(400)
+                      expect(res.body.errors.flag).toBe(flag.NOT_AVAILABLE)
+                      expect(res.body.errors.message).toBe(getLocalizedMsg({ key: 'SERVICE_NOT_AVAILABLE' }, headers['accept-language']))
+                    })
+                  
+                    it('should get success response if region and service found', async () => {
+                      const masterRegion = await seedMasterRegion.createOne('Region1', ['Jakarta'])
+                      const masterServices = await seedMasterService.seed([masterRegion])
+                      const res = await request(app).get(url).set(headers)
+                  
+                      expect(res.status).toBe(200)
+                      expect(res.body.result.region).toMatchObject({ regionId: masterRegion.id, regionName: masterRegion.name })
+                      expect(res.body.result.services).toMatchObject(masterServices.map(ele => ({ serviceName: ele.name, serviceCode: ele.code })))
+                    })
+                  })
+                  
+                </script>
+              </code>
+            </pre>
+            <aside class="notes">
+              explain why expect(res.body.result.services.length) is not
+              necessary
+            </aside>
+          </section>
+        </section>
+
+        <!------------------->
+        <!-- Miscellaneous -->
+        <!------------------->
+        <section class="miscellaneous">
+          <section>
+            <h1>Miscellaneous</h1>
+          </section>
+
+          <section>
+            <p>
+              Separate <span style="color: yellow">test utility</span> from
+              <span style="color: purple">application utility</span>
+              directory
+            </p>
+            <div class="utility-img-holder">
+              <img
+                class="fragment"
+                src="./examples/assets/test-utility.png"
+                alt=""
+              />
+              <img
+                class="fragment"
+                src="./examples/assets/app-utility.png"
+                alt=""
+              />
+            </div>
+            <a
+              class="fragment"
+              target="_blank"
+              href="https://gitlab.com/halojasa-engineering/backend/microservices/authentication-service/authentication-module/-/tree/arin/e2e/src/helpers/seeder-test"
+              >Example</a
+            >
+          </section>
+
+          <section>
+            <p>
+              Write the <span style="color: yellow">describe</span>,
+              <span style="color: coral">it</span> msg as as short & meaningful
+              as possible.
+            </p>
+
+            <div class="fragment">
+              <img
+                src="./examples/assets/meaningful-describe.png"
+                style="border-radius: 10px"
+                alt=""
+              />
+            </div>
+          </section>
+
+          <section>
+            <h2>
+              Remove any type of log from the console for test environment.
+            </h2>
+          </section>
+
+          <section>
+            <div class="test-log-holder">
+              <div class="img-holder">
+                <img src="./examples/assets/not-that.png" alt="" />
+              </div>
+
+              <div class="iframe-holder">
+                <iframe
+                  src="https://streamable.com/e/jtdgc6"
+                  frameborder="0"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <div class="test-log-holder">
+              <div class="img-holder">
+                <img src="./examples/assets/but-this.png" alt="" />
+              </div>
+
+              <div class="iframe-holder">
+                <iframe
+                  src="https://streamable.com/e/xu2g79"
+                  frameborder="0"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <q>
+              It's better not to write tests than writing unmaintainable tests.
+            </q>
+            <p style="text-align: right">&mdash; Mosh Hamedani</p>
+          </section>
+
+          <section
+            data-background="https://media.giphy.com/media/hrRJ41JB2zlgZiYcCw/giphy.gif"
+          >
+            <q
+              >Any fool can write code that a computer can understand. Good
+              programmers write code that humans can understand.</q
+            >
+
+            <p style="text-align: right">&mdash; Martin Fowler</p>
+          </section>
+
+          <section>
+            <h1>Thank You</h1>
+          </section>
+        </section>
+      </div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script>
+      // More info about initialization & config:
+      // - https://revealjs.com/initialization/
+      // - https://revealjs.com/config/
+      Reveal.initialize({
+        hash: true,
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+      });
+    </script>
+  </body>
+</html>

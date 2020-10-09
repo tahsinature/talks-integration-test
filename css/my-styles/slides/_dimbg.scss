@@ -1,0 +1,13 @@
+.dim-bg- {
+  &005 {
+    .slide-background {
+      opacity: 0.05 !important;
+    }
+  }
+
+  &01 {
+    .slide-background {
+      opacity: 0.1 !important;
+    }
+  }
+}
